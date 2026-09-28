@@ -26,7 +26,7 @@ if [ -z "$SKIP_BUILD" ]; then
   sudo rm -rf "$SYSROOT/root/slopocus"
   sudo mkdir -p "$SYSROOT/root/slopocus"
   sudo rsync -a --exclude build --exclude build-win --exclude build-aarch64 --exclude build-linux --exclude .git --exclude portmaster/out "$ROOT/" "$SYSROOT/root/slopocus/"
-  sudo chroot "$SYSROOT" /bin/bash -c "cd /root/slopocus && cmake -S . -B build-aarch64 -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS='-static-libgcc -static-libstdc++' && cmake --build build-aarch64 -j\$(nproc) && strip build-aarch64/SLOPocus"
+  sudo chroot "$SYSROOT" /bin/bash -c "cd /root/slopocus && cmake -S . -B build-aarch64 -G Ninja -DCMAKE_BUILD_TYPE=Release && cmake --build build-aarch64 -j\$(nproc) && strip build-aarch64/SLOPocus"
   mkdir -p "$ROOT/build-aarch64"
   sudo cp "$SYSROOT/root/slopocus/build-aarch64/SLOPocus" "$ROOT/build-aarch64/SLOPocus"
   sudo chown "$(id -u):$(id -g)" "$ROOT/build-aarch64/SLOPocus"

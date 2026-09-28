@@ -48,5 +48,5 @@ sudo chroot ~/sysroot-arm64 apt-get install -y g++ cmake ninja-build
 ```
 git clone --recurse-submodules --branch portmaster https://github.com/Knifethrower/SLOPocus.git slopocus
 sudo rsync -a --exclude .git slopocus/ ~/sysroot-arm64/root/slopocus/
-sudo chroot ~/sysroot-arm64 bash -c "cd /root/slopocus && cmake -S . -B build-aarch64 -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS='-static-libgcc -static-libstdc++' && cmake --build build-aarch64 && strip build-aarch64/SLOPocus"
+sudo chroot ~/sysroot-arm64 bash -c "cd /root/slopocus && cmake -S . -B build-aarch64 -G Ninja -DCMAKE_BUILD_TYPE=Release && cmake --build build-aarch64 && strip build-aarch64/SLOPocus"
 ```
