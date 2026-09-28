@@ -59,7 +59,7 @@ HighScoreScreen::HighScoreScreen(ScreenAssets& assets, const SaveFile& save, int
 	save(save),
 	episodes(episodes)
 {
-	this->table.build(assets, save, 0, ExeData::get().pointerString(PTR_HELP, 2));
+	this->table.build(assets, save, 0, padPrompts() ? "Press any button to continue" : ExeData::get().pointerString(PTR_HELP, 2));
 }
 
 void HighScoreScreen::handleEvents(EventHandler& eventHandler) {
@@ -79,7 +79,7 @@ void HighScoreScreen::handleEvents(EventHandler& eventHandler) {
 	this->pageFade.setSpeed(fadeSpeedForSteps(20));
 	this->pageFade.start(Fade::FADE_OUT, [this] {
 		this->episode++;
-		this->table.build(this->assets, this->save, this->episode, ExeData::get().pointerString(PTR_HELP, 2));
+		this->table.build(this->assets, this->save, this->episode, padPrompts() ? "Press any button to continue" : ExeData::get().pointerString(PTR_HELP, 2));
 		this->pageFade.start(Fade::FADE_IN, [this] { this->turning = false; });
 	});
 }
@@ -106,7 +106,7 @@ HighScoreEntryScreen::HighScoreEntryScreen(ScreenAssets& assets, SaveFile& save,
 void HighScoreEntryScreen::rebuild() {
 	std::memset(this->save.scoreName[this->episode][this->rank], 0, SaveFile::NAME_LENGTH);
 	std::strncpy(this->save.scoreName[this->episode][this->rank], this->name.c_str(), SaveFile::NAME_LENGTH - 1);
-	this->table.build(this->assets, this->save, this->episode, ExeData::get().string(STR_ENTER_NAME));
+	this->table.build(this->assets, this->save, this->episode, padPrompts() ? "Press START to keep this name" : ExeData::get().string(STR_ENTER_NAME));
 }
 
 void HighScoreEntryScreen::handleEvents(EventHandler& eventHandler) {

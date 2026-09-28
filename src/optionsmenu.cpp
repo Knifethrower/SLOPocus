@@ -25,7 +25,7 @@
 
 
 namespace {
-std::string helpSub() { return pocus::ExeData::get().string(pocus::STR_SUB_MENU_HELP); }
+std::string helpSub() { return pocus::ui::padPrompts() ? "Use UP/DOWN to move - START to select" : pocus::ExeData::get().string(pocus::STR_SUB_MENU_HELP); }
 std::string ioError() { return pocus::ExeData::get().string(pocus::STR_IO_ERROR); }
 // The options item as the EXE's table holds it ("Sound is now off") with the
 // state it names replaced by the current one.

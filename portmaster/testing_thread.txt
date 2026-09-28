@@ -1,0 +1,40 @@
+Instructions to install the Testing Zip:
+Drop the .zip into your Portmaster autoinstall folder and run Portmaster.
+or
+run via ssh: harbourmaster install "zip url from discord"
+
+Game Information
+Title: Hocus Pocus
+URL: https://github.com/Knifethrower/SLOPocus
+
+Instructions:
+Ready to run with the shareware episode. Optional: copy HOCUS.DAT and HOCUS.EXE (version 1.1) from your GOG or Steam copy into ports/hocuspocus/gamedata/ for the other three episodes.
+
+| Button | Action |
+|--|--|
+|B| Jump / No in prompts |
+|A| Fire / Yes in prompts |
+|Y| Fire / Yes in prompts |
+|X| Pause |
+|L1| Look up / previous page |
+|R1| Look down / next page |
+|L2| Save game |
+|R2| Restore game |
+|Start| Select in menus |
+|Select| In-game menu / back |
+
+CFW Tests:
+[ ] AmberELEC
+[ ] dArkOS
+[ ] MuOS
+ROCKNIX
+-> [ ] Libmali
+-> [ ] Panfrost
+-> [ ] Adreno (Optional)
+[ ] Knulli
+
+Resolutions:
+[ ] 480x320 (Optional)
+[ ] 640x480
+[ ] 720x720 (RGB30) (Optional)
+[ ] Higher resolutions (e.g., 1280)

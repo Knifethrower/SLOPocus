@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<config>
+    <!-- The port runs from ports/hocuspocus; the user drops HOCUS.DAT and
+         HOCUS.EXE (registered or shareware v1.1) into gamedata/. Every path is
+         checked and the registered release wins when both are present. -->
+    <installation_path>./gamedata</installation_path>
+    <installation_path>./gamedata/registered</installation_path>
+    <installation_path>./gamedata/shareware</installation_path>
+</config>

@@ -41,6 +41,12 @@
 // at 70 Hz).
 namespace pocus::ui {
 
+// PortMaster build: the game is driven through gptokeyb2, so the prompts name
+// the pad buttons (START, SELECT, A/B, L1/R1) instead of the DOS keys, and the
+// yes/no boxes take the fire and jump buttons as Y and N. Set by
+// SLOPOCUS_PAD_PROMPTS=1 in the launch script.
+bool padPrompts();
+
 using Rgb = data::asset::PaletteColor;
 using Palette256 = std::array<Rgb, 256>;
 

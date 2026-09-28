@@ -22,7 +22,18 @@ using namespace pocus;
 using namespace pocus::ui;
 
 std::string pocus::ui::helpLine(int index) {
-	return ExeData::get().pointerString(PTR_HELP, index < 0 || index > 5 ? 2 : index);
+	// The pad wording of the EXE's help lines (gptokeyb2: START = Enter,
+	// SELECT = Esc, A = fire = yes, B = jump = no).
+	static const char* PAD_LINES[6] = {
+		"Use UP/DOWN to move - START to select",
+		"Use UP/DOWN to move - START to select",
+		"Press any button to continue",
+		"Press A for yes - B for no - SELECT to exit",
+		"Use UP/DOWN to move - START to select",
+		"SELECT to exit"
+	};
+	const int i = index < 0 || index > 5 ? 2 : index;
+	return padPrompts() ? PAD_LINES[i] : ExeData::get().pointerString(PTR_HELP, i);
 }
 
 namespace {
@@ -63,10 +74,19 @@ YesNoScreen::YesNoScreen(ScreenAssets& assets, const std::string& line1, const s
 
 void YesNoScreen::handleEvents(EventHandler& eventHandler) {
 	switch (eventHandler.getKeyDown()) {
-		case KEY_Y: finish(1); break;
-		case KEY_N: finish(0); break;
-		case KEY_ESCAPE: finish(-1); break;
+		case KEY_Y: finish(1); return;
+		case KEY_N: finish(0); return;
+		case KEY_ESCAPE: finish(-1); return;
 		default: break;
+	}
+	// On the pad the fire button (A) answers yes and the jump button (B) no.
+	if (padPrompts()) {
+		if (eventHandler.isButtonDown(BUTTON_FIRE)) {
+			finish(1);
+		}
+		else if (eventHandler.isButtonDown(BUTTON_JUMP)) {
+			finish(0);
+		}
 	}
 }
 

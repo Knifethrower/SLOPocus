@@ -88,20 +88,22 @@ void TextPageScreen::buildPage() {
 	// else "Page N of M - Press PGDN/PGUP - ESC to cancel".
 	const int pages = (int)this->files.size();
 	std::string captionText;
+	// Pad prompts: L1/R1 are PgUp/PgDn and SELECT is Esc.
+	const bool pad = padPrompts();
 	const ExeData& exe = ExeData::get();
 	if (pages == 1) {
-		captionText = exe.pointerString(PTR_HELP, 2);
+		captionText = pad ? "Press any button to continue" : exe.pointerString(PTR_HELP, 2);
 	}
 	else {
 		captionText = exe.string(STR_PAGE) + std::to_string(this->page + 1) + exe.string(STR_OF) + std::to_string(pages);
 		if (this->page == 0) {
-			captionText += exe.string(STR_PAGE_NEXT);
+			captionText += pad ? " - Press R1 - SELECT to cancel" : exe.string(STR_PAGE_NEXT);
 		}
 		else if (this->page == pages - 1) {
-			captionText += exe.string(STR_PAGE_PREVIOUS);
+			captionText += pad ? " - Press L1 - SELECT to cancel" : exe.string(STR_PAGE_PREVIOUS);
 		}
 		else {
-			captionText += exe.string(STR_PAGE_BOTH);
+			captionText += pad ? " - Press L1/R1 - SELECT to cancel" : exe.string(STR_PAGE_BOTH);
 		}
 	}
 	this->caption = this->assets.shadowText(captionText, 4);

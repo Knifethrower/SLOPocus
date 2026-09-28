@@ -1,0 +1,44 @@
+{
+  "version": 4,
+  "name": "hocuspocus.zip",
+  "items": [
+    "Hocus Pocus.sh",
+    "hocuspocus"
+  ],
+  "items_opt": [],
+  "attr": {
+    "title": "Hocus Pocus",
+    "porter": [
+      "Knifethrower"
+    ],
+    "desc": "Apogee's 1994 platformer: guide the apprentice wizard Hocus through castles of nine levels, collecting every crystal while blasting the monsters that guard them, with switches, keys, elevators and teleports in the way. Runs the SLOPocus reimplementation, which follows the original executable's game logic, menus, save slots, high scores and level bonuses. The shareware episode is included.",
+    "desc_md": null,
+    "inst": "Ready to run with the shareware episode. For the other three episodes, copy HOCUS.DAT and HOCUS.EXE (version 1.1) from your GOG or Steam copy into ports/hocuspocus/gamedata/.",
+    "inst_md": null,
+    "genres": [
+      "platformer"
+    ],
+    "image": null,
+    "rtr": true,
+    "exp": false,
+    "runtime": [],
+    "store": [
+      {
+        "name": "GOG",
+        "gameurl": "https://www.gog.com/en/game/hocus_pocus",
+        "developerurl": "https://en.wikipedia.org/wiki/Hocus_Pocus_(video_game)"
+      },
+      {
+        "name": "Steam",
+        "gameurl": "https://store.steampowered.com/app/358290/Hocus_Pocus/",
+        "developerurl": "https://en.wikipedia.org/wiki/Hocus_Pocus_(video_game)"
+      }
+    ],
+    "availability": "demo",
+    "reqs": [],
+    "arch": [
+      "aarch64"
+    ],
+    "min_glibc": ""
+  }
+}

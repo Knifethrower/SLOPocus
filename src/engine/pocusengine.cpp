@@ -225,18 +225,26 @@ Rules& PocusEngine::getRules() {
 	return this->rules;
 }
 
+std::string PocusEngine::dataDir() {
+	std::error_code ec;
+	if (std::filesystem::is_regular_file("data/config.xml", ec)) {
+		return "data";
+	}
+	return "../data";
+}
+
 bool PocusEngine::loadConfig() {
-	return this->config.load("../data/config.xml");
+	return this->config.load(dataDir() + "/config.xml");
 }
 
 bool PocusEngine::loadRules() {
-	return this->rules.load("../data/rules.xml");
+	return this->rules.load(dataDir() + "/rules.xml");
 }
 
 bool PocusEngine::loadData() {
 	const std::string& path = GameVersion::get().datPath;
 
-	data::Fat fat = pocus::data::FatLoader::loadFromFile(std::string("../data/") + GameVersion::get().datFat);
+	data::Fat fat = pocus::data::FatLoader::loadFromFile(dataDir() + "/" + GameVersion::get().datFat);
 
 	if (fat.getNumberEntries() == 0) {
 		LOGE << "Data FAT file doesn't have any entries";
@@ -249,7 +257,7 @@ bool PocusEngine::loadData() {
 bool PocusEngine::loadExecutable() {
 	const std::string& path = GameVersion::get().exePath;
 
-	data::Fat fat = pocus::data::FatLoader::loadFromFile(std::string("../data/") + GameVersion::get().exeFat);
+	data::Fat fat = pocus::data::FatLoader::loadFromFile(dataDir() + "/" + GameVersion::get().exeFat);
 
 	if (fat.getNumberEntries() == 0) {
 		LOGE << "Executable FAT file doesn't have any entries";

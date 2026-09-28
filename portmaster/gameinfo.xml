@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gameList>
+  <game>
+    <path>./Hocus Pocus.sh</path>
+    <name>Hocus Pocus</name>
+    <desc>Hocus Pocus is Moonlite Software's 1994 side-scrolling platformer published by Apogee. The apprentice wizard Hocus must clear each castle of its crystals and monsters to earn a seat on the Council of Wizards, across four episodes of nine levels with switches, keys, elevators, teleports and end-of-level bonuses for speed and treasure. This port includes the shareware episode and takes the registered game files for the other three.</desc>
+    <releasedate>19940601T000000</releasedate>
+    <developer>Moonlite Software</developer>
+    <publisher>Apogee Software</publisher>
+    <genre>Platformer</genre>
+    <image>./hocuspocus/cover.png</image>
+  </game>
+</gameList>

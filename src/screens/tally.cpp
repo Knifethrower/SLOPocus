@@ -80,7 +80,7 @@ TallyScreen::TallyScreen(ScreenAssets& assets, bool completed, int levelNumber, 
 		}
 	}
 
-	this->caption = assets.shadowText(exe.string(STR_PRESS_ANY_KEY), 4);
+	this->caption = assets.shadowText(padPrompts() ? "Press any button" : exe.string(STR_PRESS_ANY_KEY), 4);
 }
 
 void TallyScreen::handleEvents(EventHandler& eventHandler) {

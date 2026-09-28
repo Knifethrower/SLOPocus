@@ -35,9 +35,9 @@
 namespace {
 	// Bottom help lines, per menu kind (DS:19dc table in the original).
 	// The help lines: the main menu's from the EXE's help table, the sub
-	// menus' plain one.
-	std::string helpMain() { return pocus::ExeData::get().pointerString(pocus::PTR_HELP, 0); }
-	std::string helpSub() { return pocus::ExeData::get().string(pocus::STR_SUB_MENU_HELP); }
+	// menus' plain one; the pad wording (START = Enter) under gptokeyb2.
+	std::string helpMain() { return pocus::ui::padPrompts() ? "Use UP/DOWN to move - START to select" : pocus::ExeData::get().pointerString(pocus::PTR_HELP, 0); }
+	std::string helpSub() { return pocus::ui::padPrompts() ? "Use UP/DOWN to move - START to select" : pocus::ExeData::get().string(pocus::STR_SUB_MENU_HELP); }
 	// A menu item's text without the trailing "~" that marks a gap after it.
 	std::string itemText(const std::string& item) {
 		return !item.empty() && item.back() == '~' ? item.substr(0, item.size() - 1) : item;

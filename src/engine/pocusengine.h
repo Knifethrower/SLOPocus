@@ -39,6 +39,10 @@ public:
 
 	int run(int argc, char* argv[]);
 
+	// "data" under the working directory when it exists (a packaged copy),
+	// else "../data" (running from the build directory).
+	static std::string dataDir();
+
 protected:
 	virtual void createStates(StateManager& stateManager) = 0;
 	

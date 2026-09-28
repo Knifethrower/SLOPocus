@@ -848,7 +848,7 @@ void StateGame::buildInGameMenu() {
 	this->inGameMenu.clear();
 	const pocus::ExeData& exe = pocus::ExeData::get();
 	const std::vector<std::string> items = exe.pointerStrings(pocus::PTR_MENU_INGAME);
-	this->inGameMenu.setBottomText(exe.string(pocus::STR_SUB_MENU_HELP));
+	this->inGameMenu.setBottomText(pocus::ui::padPrompts() ? "Use UP/DOWN to move - START to select" : exe.string(pocus::STR_SUB_MENU_HELP));
 	this->inGameMenu.setEscapeHandler([this] { closeInGameMenu(); });
 	this->inGameMenu.addOption(items[0], [this] { openInstructions([this] { buildInGameMenu(); }); });
 	this->inGameMenu.addOption(items[1], [this] {

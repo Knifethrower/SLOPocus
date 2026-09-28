@@ -2,7 +2,11 @@ cmake-build-debug/
 cmake-build-release/
 .idea/
 .vscode/
-hocuspocus/
+/hocuspocus/
 build/
 *.log
 build-win/
+build-aarch64/
+build-linux/
+portmaster/out/
+portmaster/TimGM6mb.sf2

@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cstdlib>
 #include "screen.h"
 #include "../version.h"
 #include "../engine/data/asset/image.h"
@@ -23,6 +24,14 @@
 
 using namespace pocus;
 using namespace pocus::ui;
+
+bool pocus::ui::padPrompts() {
+	static const bool enabled = []() {
+		const char* value = std::getenv("SLOPOCUS_PAD_PROMPTS");
+		return value && value[0] != '\0' && value[0] != '0';
+	}();
+	return enabled;
+}
 
 namespace {
 

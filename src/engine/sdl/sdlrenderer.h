@@ -30,6 +30,8 @@ public:
 	SdlRenderer(const RendererParameters &parameters);
 
 	virtual bool initialize() override;
+	// Fits the 320x200 frame into the output (see the .cpp).
+	void applyScaling();
 	virtual void release() override;
 	virtual void clear() override;
 	virtual void render() override;
@@ -46,6 +48,11 @@ public:
 
 private:
 	RendererParameters parameters;
+	bool boxed { false };            // SLOPOCUS_ASPECT set
+	bool fill { false };
+	float aspect { 4.0f / 3.0f };
+	SDL_Texture* frame { nullptr };   // 4:3 mode: the 320x200 render target
+	SDL_Rect frameBox { 0, 0, 0, 0 };  // where it is presented
 	SDL_Window *window;
 	SDL_Renderer *renderer;
 };
