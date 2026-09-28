@@ -18,6 +18,8 @@
 #include <iostream>
 #include <filesystem>
 #include "pocusengine.h"
+#include "../version.h"
+#include "../exedata.h"
 #include "log.h"
 #include "definitions.h"
 #include "data/asset/leveltime.h"
@@ -47,35 +49,51 @@ int PocusEngine::run(int argc, char **argv) {
 }
 
 bool PocusEngine::initialize() {
-	Log::initialize("openpocus.log");
+	Log::initialize("slopocus.log");
 
-	LOGI << "Initializing OpenPocus...";
+	LOGI << "Initializing SLOPocus...";
 
 	if (!loadConfig()) {
 		LOGE << "Engine: error loading config.xml file.";
 		return false;
 	}
-	
+
 	if (!this->renderer || !this->renderer->initialize()) {
 		LOGE << "Engine: error initializing renderer.";
 		return false;
 	}
-	
+
 	if (!this->audio || !this->audio->initialize()) {
 		LOGE << "Engine: error initializing audio system.";
 		return false;
 	}
 
+	if (!GameVersion::detect(this->config.getInstallationPaths())) {
+		LOGE << "Engine: no known Hocus Pocus release (HOCUS.DAT + HOCUS.EXE) found in the configured installation path(s).";
+		return false;
+	}
+	// The game's tables and texts come from the executable itself.
+	if (!ExeData::load(GameVersion::get().exePath, GameVersion::get().shareware)) {
+		LOGE << "Engine: error reading the game data from HOCUS.EXE.";
+		return false;
+	}
+
+
 	if (!loadData()) {
 		LOGE << "Engine: error loading data.";
 		return false;
 	}
-	
+
 	if (!loadExecutable()) {
 		LOGE << "Engine: error loading executable.";
 		return false;
 	}
-	
+
+	if (!loadRules()) {
+		LOGE << "Engine: error loading rules.xml file.";
+		return false;
+	}
+
 	createStates(this->stateManager);
 	this->stateManager.createStates(getDataManager());
 	if (!this->stateManager.getCurrentState()) {
@@ -90,7 +108,7 @@ bool PocusEngine::initialize() {
 }
 
 void PocusEngine::loop() {
-	LOGI << "OpenPocus is running";
+	LOGI << "SLOPocus is running";
 
 	const uint32_t fps = 24;
 	const uint32_t delay = (1000 / fps);
@@ -122,6 +140,7 @@ void PocusEngine::loop() {
 		if (state) {
 			state->render(*this->renderer);
 		}
+
 		this->renderer->render();
 
 		if (this->stateManager.getQuit()) {
@@ -134,17 +153,17 @@ void PocusEngine::loop() {
 
 float PocusEngine::processFrameRate(const Tick& startTick, int delay, int fixedFpsDelay) {
 	wait(1);
-	
+
 	uint32_t elapsed = getElapsedTime(startTick);
 	if (elapsed < delay) {
 		wait(delay - elapsed);
 	}
-	
+
 	elapsed = getElapsedTime(startTick);
 	if (elapsed < fixedFpsDelay) {
 		elapsed = fixedFpsDelay - elapsed;
 	}
-	
+
 	return (float)elapsed / (float)fixedFpsDelay;
 }
 
@@ -153,7 +172,7 @@ void PocusEngine::processStateMessage(State* state) {
 		return;
 	}
 
-	const State::Message_t& message = state->message.first;
+	const State::Message_t message = state->message.first;
 	switch (message) {
 		case State::MESSAGE_QUIT:
 			this->stateManager.quit(0);
@@ -166,15 +185,24 @@ void PocusEngine::processStateMessage(State* state) {
 		default:
 			break;
 	}
+
+	// A state's message otherwise stays set forever once raised - harmless for a
+	// one-way MESSAGE_QUIT, but MESSAGE_CHANGE left behind on a state you can
+	// navigate back to (e.g. a menu reachable again after leaving
+	// gameplay) would re-fire the same change on the very next update() after
+	// simply re-entering it, with no new input.
+	if (message != State::MESSAGE_NONE) {
+		state->message = std::make_pair(State::MESSAGE_NONE, nullptr);
+	}
 }
 
 void PocusEngine::release() {
-	LOGI << "Releasing OpenPocus...";
+	LOGI << "Releasing SLOPocus...";
 
 	if (auto state = this->stateManager.getCurrentState()) {
 		state->onDetach();
 	}
-	
+
 	if (this->audio) {
 		this->audio->release();
 		this->audio = nullptr;
@@ -193,42 +221,40 @@ data::DataManager& PocusEngine::getDataManager() {
 	return this->dataManger;
 }
 
+Rules& PocusEngine::getRules() {
+	return this->rules;
+}
+
 bool PocusEngine::loadConfig() {
 	return this->config.load("../data/config.xml");
 }
 
+bool PocusEngine::loadRules() {
+	return this->rules.load("../data/rules.xml");
+}
+
 bool PocusEngine::loadData() {
-	std::string path = this->config.getInstallationPath() + "/hocus.dat";
-	
-	if (!std::filesystem::exists(path)) {
-		LOGE << "Data file not found at " << this->config.getInstallationPath();
-		return false;
-	}
-	
-	data::Fat fat = pocus::data::FatLoader::loadFromFile(getDatFatFilename());
-	
+	const std::string& path = GameVersion::get().datPath;
+
+	data::Fat fat = pocus::data::FatLoader::loadFromFile(std::string("../data/") + GameVersion::get().datFat);
+
 	if (fat.getNumberEntries() == 0) {
 		LOGE << "Data FAT file doesn't have any entries";
 		return false;
 	}
-	
+
 	return this->dataManger.getData().loadFromFile(path, fat);
 }
 
 bool PocusEngine::loadExecutable() {
-	std::string path = this->config.getInstallationPath() + "/hocus.exe";
-	
-	if (!std::filesystem::exists(path)) {
-		LOGE << "Executable file not found at " << this->config.getInstallationPath();
-		return false;
-	}
-	
-	data::Fat fat = pocus::data::FatLoader::loadFromFile(getExeFatFilename());
-	
+	const std::string& path = GameVersion::get().exePath;
+
+	data::Fat fat = pocus::data::FatLoader::loadFromFile(std::string("../data/") + GameVersion::get().exeFat);
+
 	if (fat.getNumberEntries() == 0) {
 		LOGE << "Executable FAT file doesn't have any entries";
 		return false;
 	}
-	
+
 	return this->dataManger.getExecutable().loadFromFile(path, fat);
 }

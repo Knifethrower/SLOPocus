@@ -48,16 +48,19 @@ bool SdlTexture::createBlank(uint32_t width, uint32_t height) {
 }
 
 void SdlTexture::setPixel(uint32_t index, uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha) {
+	if (!this->surface || index >= (uint32_t)(this->surface->w * this->surface->h)) {
+		return;
+	}
 	auto* pixels = (Uint32*)this->surface->pixels;
 	pixels[index] = SDL_MapRGB(this->surface->format,red,green,blue);
 }
 
 uint32_t SdlTexture::getWidth() const {
-	return this->surface->w;
+	return this->surface ? (uint32_t)this->surface->w : 0;
 }
 
 uint32_t SdlTexture::getHeight() const {
-	return this->surface->h;
+	return this->surface ? (uint32_t)this->surface->h : 0;
 }
 
 bool SdlTexture::isReady() const {
@@ -98,6 +101,13 @@ void SdlTexture::paste(const Texture& texture, uint32_t fx, uint32_t fy, uint32_
 }
 
 void SdlTexture::getPixel(uint32_t index, uint8_t* red, uint8_t* green, uint8_t* blue, uint8_t* alpha) {
+	if (!this->surface || index >= (uint32_t)(this->surface->w * this->surface->h)) {
+		if (red) *red = 0;
+		if (green) *green = 0;
+		if (blue) *blue = 0;
+		if (alpha) *alpha = 0;
+		return;
+	}
 	Uint32 *pixels = (Uint32*)this->surface->pixels;
 	Uint32 tempPixel = pixels[index];
 	
@@ -115,21 +125,31 @@ void SdlTexture::setColorKey(uint8_t red, uint8_t green, uint8_t blue) {
 
 std::unique_ptr<Texture> SdlTexture::extract(uint32_t x, uint32_t y, uint32_t w, uint32_t h, const Color* colorKey) {
 	auto sdlTexture = std::make_unique<SdlTexture>();
-	
+
 	SDL_Rect rect = (SDL_Rect){(int)x, (int)y, (int)w, (int)h};
-	
+
 	sdlTexture->createBlank(w, h);
+
+	// If the source is already color-keyed (e.g. re-extracting an already-extracted
+	// sprite frame), SDL_BlitSurface skips copying keyed-out pixels, leaving the
+	// destination's uninitialized (black) memory there instead of the key color.
+	// Pre-fill with the key color so skipped pixels land on the right transparent
+	// color instead of black.
+	if (colorKey) {
+		sdlTexture->fill(colorKey->red, colorKey->green, colorKey->blue, 255);
+	}
+
 	SDL_BlitSurface(this->surface, &rect, sdlTexture->surface, nullptr);
-	
+
 	if (colorKey) {
 		sdlTexture->setColorKey(colorKey->red, colorKey->green, colorKey->blue);
 	}
-	
+
 	return std::move(sdlTexture);
 }
 
 bool SdlTexture::saveToFile(const std::string& filename) {
-	SDL_SaveBMP(this->surface, filename.c_str());
+	return SDL_SaveBMP(this->surface, filename.c_str()) == 0;
 }
 
 void SdlTexture::setOverlayColor(const Color& color) {

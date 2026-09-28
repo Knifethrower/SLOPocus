@@ -27,6 +27,8 @@ bool LevelBackground::loadFromStream(const char *stream, uint32_t length) {
 		this->backgroundIds.push_back(id);
 		stream += sizeof(uint16_t);
 	}
+
+	return true;
 }
 
 void LevelBackground::release() {

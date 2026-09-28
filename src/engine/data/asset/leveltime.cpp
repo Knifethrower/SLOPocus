@@ -27,6 +27,8 @@ bool LevelTime::loadFromStream(const char *stream, uint32_t length) {
 		this->time.push_back(levelTimeLimit);
 		stream += sizeof(uint16_t);
 	}
+
+	return true;
 }
 
 void LevelTime::release() {

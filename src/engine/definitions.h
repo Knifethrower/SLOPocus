@@ -27,10 +27,11 @@ namespace pocus {
 #define MAP_WIDTH		240
 #define MAP_HEIGHT		60
 
-#define __DEBUG_POCUS__
-#ifdef __DEBUG_POCUS__
-//#	define __DEBUG_ITEM__
-#endif __DEBUG_POCUS__
+enum Difficulty_t {
+	EASY = 1,
+	NORMAL = 3,
+	HARD = 4
+};
 
 #define getBit(n,b) ((n >> b) & 1)
 

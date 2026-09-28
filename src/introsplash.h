@@ -23,9 +23,13 @@
 #include "engine/definitions.h"
 #include "engine/fade.h"
 
+// The title screen (1b97:0001 / 1b93:000c): the menu tune starts, the
+// title picture fades in over 40 steps with the laugh, and after 4 s or a
+// key it fades out in 30 steps into the main menu. The registered game
+// draws its "Registered Version 1.1" band (file 3) at (0,188) over it.
 class IntroSplash : public pocus::State {
 public:
-	enum { MIN_TIME = 3000, TIME = 10000 };
+	enum { TIME = 4000 };
 
 public:
 	void onCreate(pocus::data::DataManager& dataManager) override;
@@ -35,13 +39,18 @@ public:
 	void handleEvents(pocus::EventHandler &eventHandler) override;
 	void render(pocus::Renderer &renderer) override;
 	void update(float dt) override;
-	
+
 private:
+	void leave();
+
 	std::unique_ptr<pocus::Texture> backgroundImage;
+	std::unique_ptr<pocus::Texture> bandImage;
 	std::unique_ptr<pocus::Sound> backgroundMusic;
 	std::unique_ptr<pocus::Sound> laughSound;
 	pocus::Tick startTick { pocus::getNow() };
 	pocus::Fade fade;
+	bool leaving { false };
+	bool skipPending { false };
 };
 
 

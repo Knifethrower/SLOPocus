@@ -90,6 +90,11 @@ public:
 	void hit(uint32_t invulnerableTime = DEFAULT_HIT_TIME);
 	
 	[[nodiscard]] bool isInvulnerable() const;
+
+protected:
+	// The animation registered under a state name, or nullptr.
+	Animation* findState(const std::string& state);
+	[[nodiscard]] const std::string& getCurrentStateId() const { return this->currentStateId; }
 	
 private:
 	Rect rect {};
@@ -98,7 +103,7 @@ private:
 	Animation* currentState { nullptr };
 	Direction_t direction { RIGHT };
 	Point velocity { .0f, .0f };
-	float speed { 2.0f };
+	float speed { 2.5f };
 	Tick tickCreation;
 	bool onHit { false };
 	Tick tickHit;

@@ -35,11 +35,19 @@ public:
 	bool isButtonUp(const Button_t &button) override;
 	bool isQuit() override;
     bool isAnyButtonDown() const override;
+	[[nodiscard]] Key_t getKeyDown() const override;
+	[[nodiscard]] char getTextInput() const override;
+	[[nodiscard]] int getDosScancode() const override;
+	void setButtonKey(const Button_t& button, Key_t key) override;
+	[[nodiscard]] Key_t getButtonKey(const Button_t& button) const override;
 
 private:
+	static Key_t toKey(SDL_Keycode keycode);
+	static SDL_Keycode toKeycode(Key_t key);
+
 	SDL_Event event;
 
-	std::unordered_map<Button_t, int> buttonMapping;
+	std::unordered_map<Button_t, SDL_Keycode> buttonMapping;
 };
 
 }

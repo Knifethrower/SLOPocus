@@ -15,21 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef OPENPOCUS_H
-#define OPENPOCUS_H
+#ifndef SLOPOCUS_H
+#define SLOPOCUS_H
 
 #include "engine/pocusengine.h"
 
-class OpenPocus : public pocus::PocusEngine {
+class SLOPocus : public pocus::PocusEngine {
 public:
-	explicit OpenPocus(const pocus::RendererParameters &rendererParameters);
+	explicit SLOPocus(const pocus::RendererParameters &rendererParameters);
 	
-	std::string getDatFatFilename() const override;
-	std::string getExeFatFilename() const override;
 	
 protected:
 	void createStates(pocus::StateManager& stateManager) override;
 };
 
 
-#endif //OPENPOCUS_H
+#endif //SLOPOCUS_H

@@ -48,8 +48,8 @@ public:
 	void restoreColor() override;
 	
 private:
-	SDL_Surface* surface;
-	SDL_Texture* texture;
+	SDL_Surface* surface { nullptr };
+	SDL_Texture* texture { nullptr };
 };
 
 }

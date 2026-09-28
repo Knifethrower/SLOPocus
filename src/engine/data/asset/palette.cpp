@@ -28,6 +28,8 @@ bool Palette::loadFromStream(const char *stream, uint32_t length) {
 		this->colors[i].g = this->colors[i].g << 2;
 		this->colors[i].b = this->colors[i].b << 2;
 	}
+
+	return true;
 }
 
 void Palette::release() {

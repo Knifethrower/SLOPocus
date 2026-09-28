@@ -26,6 +26,8 @@ bool Pcx::loadFromStream(const char *stream, uint32_t length) {
 	for (uint32_t i = 0; i < length; i++) {
 		this->data[i] = stream[i];
 	}
+
+	return true;
 }
 
 void Pcx::release() {
@@ -34,6 +36,17 @@ void Pcx::release() {
 
 std::unique_ptr<pocus::Texture> Pcx::createTexture() {
 	std::unique_ptr<Texture> texture = Provider::provideTexture();
-	texture->loadFromStream(reinterpret_cast<char*>(this->data.data()), data.size());
+
+	// loadFromStream()'s success was previously discarded here, so a caller
+	// handed malformed/non-PCX bytes (e.g. a FAT slot that doesn't actually
+	// hold a PCX - confirmed happening for a few of episode 4's later
+	// backgrounds) got back a Texture that LOOKED valid (non-null pointer)
+	// but had a null SDL surface underneath, crashing the first time
+	// anything called getWidth()/getHeight()/render on it. Surface the
+	// failure as a null return instead so callers can check it.
+	if (!texture->loadFromStream(reinterpret_cast<char*>(this->data.data()), data.size())) {
+		return nullptr;
+	}
+
 	return std::move(texture);
 }

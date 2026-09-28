@@ -20,9 +20,9 @@
 
 //#define LEAKED_BETA
 //#define SHAREWARE_1_0
-#define SHAREWARE_1_1
+//#define SHAREWARE_1_1
 //#define REGISTERED_1_0
-//#define REGISTERED_1_1
+#define REGISTERED_1_1
 
 #if defined(LEAKED_BETA)
 #   define NUMBER_FILES     236

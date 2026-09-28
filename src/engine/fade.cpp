@@ -82,6 +82,9 @@ void Fade::update(float dt) {
 }
 
 void Fade::render(Renderer& renderer) {
+	if (this->color.alpha == 0) {
+		return;
+	}
 	renderer.drawRect(Rect(Point(0, 0), Size(-1, -1)), this->color);
 }
 
@@ -95,6 +98,10 @@ void Fade::setSpeed(float speed) {
 
 float Fade::getSpeed() const {
 	return this->speed;
+}
+
+void Fade::setColor(const Color& color) {
+	this->color = color;
 }
 
 void Fade::setOnFinished(std::function<void()> onFinished) {

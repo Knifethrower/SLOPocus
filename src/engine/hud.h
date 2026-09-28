@@ -47,6 +47,9 @@ public:
 	void updateCrystals(uint32_t current, uint32_t max);
 	void updateLevel(uint32_t level);
 	void updateKeys(bool silverKey, bool goldenKey);
+	// The level number blinks once every treasure is found (348d: glyph 10 of
+	// the digit strip, a blank, for 9 of every 20 frames).
+	void setLevelVisible(bool visible) { this->levelVisible = visible; }
 	
 	void render(Renderer& renderer);
 	
@@ -63,6 +66,7 @@ private:
 	std::unique_ptr<Texture> textureGoldenKey;
 	bool silverKey;
 	bool goldenKey;
+	bool levelVisible { true };
 	
 	uint8_t fontColor;
 };

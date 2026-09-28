@@ -16,6 +16,7 @@
  */
 
 #include "sdlsound.h"
+#include "../log.h"
 
 using namespace pocus;
 
@@ -33,9 +34,9 @@ void SdlSound::release() {
 
 bool SdlSound::loadFromStream(const char* stream, uint32_t length) {
 	SDL_RWops* rw;
-	
+
 	rw = SDL_RWFromConstMem((const void*)stream, length);
-	
+
 	this->music = Mix_LoadMUS_RW(rw, 1);
 	if (!this->music)	{
 		rw = SDL_RWFromConstMem((const void*)stream, length);
@@ -44,18 +45,33 @@ bool SdlSound::loadFromStream(const char* stream, uint32_t length) {
 			return false;
 		}
 	}
-	
+
 	return true;
 }
 
 void SdlSound::play() {
 	if (this->music) {
-		Mix_PlayMusic(this->music, 0);
+		if (Mix_PlayMusic(this->music, -1) != 0) { // loop indefinitely - background music, not a one-shot cue
+			LOGE << "SdlSound: Mix_PlayMusic failed: " << Mix_GetError();
+		}
+		else {
+			// The Windows MIDI device does not pick up the mixer's music volume
+			// when the stream starts (it stays silent until the volume is set
+			// while playing), so push the current level again now.
+			Mix_VolumeMusic(Mix_VolumeMusic(-1));
+			LOGD << "SdlSound: music started, volume " << Mix_VolumeMusic(-1);
+		}
 		return;
 	}
-	
+
 	if (this->chunk) {
-		Mix_PlayChannel(-1, this->chunk, 0);
+		const int channel = Mix_PlayChannel(-1, this->chunk, 0);
+		if (channel == -1) {
+			LOGE << "SdlSound: Mix_PlayChannel failed: " << Mix_GetError();
+		}
+		else {
+			Mix_Volume(channel, Mix_Volume(-1, -1));
+		}
 		return;
 	}
 }

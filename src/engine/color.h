@@ -39,6 +39,7 @@ namespace color {
 	static const Color yellow = (Color) {255, 255, 0, 255};
 	static const Color redAlpha = (Color){255, 0, 0, 128};
 	static const Color blueAlpha = (Color){0, 0, 255, 128};
+	static const Color transparent = (Color){0, 0, 0, 0};
 }
 
 }

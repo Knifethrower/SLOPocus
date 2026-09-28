@@ -49,12 +49,15 @@ public:
 	[[nodiscard]] float getSpeed() const;
 	
 	void setOnFinished(std::function<void()> onFinished);
-	
+
+	void setColor(const Color& color);
+
 	bool isRunning() const;
 	
 private:
 	Tick tickStart;
-	Color color { color::black };
+	// Transparent until a fade starts (start() sets the alpha for its direction).
+	Color color { color::transparent };
 	float alpha { 0.0f };
 	float speed { 3.0f };
 	bool running { false };

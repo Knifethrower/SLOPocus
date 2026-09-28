@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rules>
+    <hazard_damage>4</hazard_damage>
+    <damage_multiplier_per_difficulty>1</damage_multiplier_per_difficulty>
+</rules>

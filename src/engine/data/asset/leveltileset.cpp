@@ -27,6 +27,8 @@ bool LevelTileSet::loadFromStream(const char *stream, uint32_t length) {
 		this->tileSetId.push_back(levelTimeLimit);
 		stream += sizeof(uint16_t);
 	}
+
+	return true;
 }
 
 void LevelTileSet::release() {

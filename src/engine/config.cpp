@@ -23,29 +23,31 @@ using namespace pocus;
 bool Config::load(const std::string& filename) {
 	tinyxml2::XMLDocument document;
 	tinyxml2::XMLError error;
-	
+
 	if ((error = document.LoadFile(filename.c_str())) != tinyxml2::XML_SUCCESS) {
 		return false;
 	}
-	
+
 	tinyxml2::XMLElement* element = document.FirstChildElement("config");
 	if (!element) {
 		return false;
 	}
-	
-	tinyxml2::XMLElement* eInstallationPath = element->FirstChildElement("installation_path");
-	if (!eInstallationPath) {
-		return false;
+
+	for (tinyxml2::XMLElement* eInstallationPath = element->FirstChildElement("installation_path");
+		 eInstallationPath;
+		 eInstallationPath = eInstallationPath->NextSiblingElement("installation_path")) {
+		if (eInstallationPath->GetText()) {
+			this->installationPaths.emplace_back(eInstallationPath->GetText());
+		}
 	}
-	this->installationPath = std::string(eInstallationPath->GetText());
-	
-	return true;
+
+	return !this->installationPaths.empty();
 }
 
-const std::string &Config::getInstallationPath() const {
-	return installationPath;
+const std::vector<std::string>& Config::getInstallationPaths() const {
+	return this->installationPaths;
 }
 
-void Config::setInstallationPath(const std::string &installationPath) {
-	Config::installationPath = installationPath;
+void Config::addInstallationPath(const std::string& installationPath) {
+	this->installationPaths.push_back(installationPath);
 }

@@ -41,7 +41,9 @@ public:
 	void drawTexture(Texture& texture, const Point& point) override;
 	void drawRect(const Rect& rect, const Color& color) override;
 	void drawPoint(const Point& point, const Color& color) override;
-	
+
+
+
 private:
 	RendererParameters parameters;
 	SDL_Window *window;

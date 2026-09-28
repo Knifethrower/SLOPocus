@@ -83,6 +83,10 @@ public:
 	void start();
 	void render(Renderer& renderer, const Point& offset);
 	void update(float dt);
+	// The original's per-frame tile animation (FUN_1ba5_2c81, second half):
+	// only the background layer animates, only on the 21x10 visible window,
+	// one step per 20 Hz game frame, per the level's animation table.
+	void animateTick(int cameraCol, int cameraRow);
 	void create(uint32_t width, uint32_t height);
 	
 	Layer& getLayer(uint8_t layer);
@@ -117,6 +121,13 @@ public:
 	
 	[[nodiscard]] uint32_t getLimitTime() const;
 	void setLimitTime(uint32_t limitTime);
+
+	// the EXE elevator table tile ids for this level (see LevelElevator) - a left
+	// id of -1 means no elevators. Game scans the collision layer for these
+	// at level start to find where the actual elevator cars are.
+	[[nodiscard]] int16_t getElevatorLeftTile() const;
+	[[nodiscard]] int16_t getElevatorRightTile() const;
+	void setElevatorTiles(int16_t leftTile, int16_t rightTile);
 	
 	[[nodiscard]] uint8_t getCrystals() const;
 	
@@ -124,6 +135,8 @@ public:
 	void disableEvent(const Point& point);
 	
 	void removeTile(uint8_t layer, const Point& tile);
+	void setTile(uint8_t layer, const Point& tile, uint16_t id);
+	void fillRegion(uint8_t layer, const Point& topLeft, const Point& bottomRight, uint16_t id);
 	
 private:
 	std::unique_ptr<Sound> backgroundMusic { nullptr };
@@ -152,7 +165,10 @@ private:
 	pocus::data::asset::EventLayer eventLayer;
 	
 	uint32_t limitTime;
-	
+
+	int16_t elevatorLeftTile { -1 };
+	int16_t elevatorRightTile { -1 };
+
 };
 
 class MapBuilder {

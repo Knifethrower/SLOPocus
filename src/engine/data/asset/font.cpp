@@ -151,10 +151,11 @@ std::unique_ptr<pocus::Texture> Font::writeShadow(const std::string& text, const
 	auto shadow = internalWrite(text);
 	
 	// Apply color
-	for (uint32_t i = 0; i < textureLabel->getWidth() * textureLabel->getHeight(); i++) {
+	// The foreground/shadow copies are one pixel smaller than the canvas.
+	for (uint32_t i = 0; i < foreground->getWidth() * foreground->getHeight(); i++) {
 		uint8_t red, green, blue;
 		const PaletteColor& paletteColor = palette.colors[color];
-		
+
 		foreground->getPixel(i, &red, &green, &blue, nullptr);
 		if (red == 255 && green == 255 && blue == 255) {
 			foreground->setPixel(i, paletteColor.r, paletteColor.g, paletteColor.b, 255);
@@ -223,12 +224,13 @@ std::unique_ptr<pocus::Texture> Font::writeGradientShadow(const std::string& tex
 	auto shadow = internalWrite(text);
 	
 	// Apply color
-	for (uint32_t i = 0; i < textureLabel->getWidth() * textureLabel->getHeight(); i++) {
-		const uint32_t y = i / textureLabel->getWidth();
+	// The foreground/shadow copies are one pixel smaller than the canvas.
+	for (uint32_t i = 0; i < foreground->getWidth() * foreground->getHeight(); i++) {
+		const uint32_t y = i / foreground->getWidth();
 		uint8_t red, green, blue;
-		
+
 		const PaletteColor& paletteColor = palette.colors[startColor + y];
-		
+
 		foreground->getPixel(i, &red, &green, &blue, nullptr);
 		if (red == 255 && green == 255 && blue == 255) {
 			foreground->setPixel(i, paletteColor.r, paletteColor.g, paletteColor.b, 255);

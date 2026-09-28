@@ -38,7 +38,20 @@ public:
 	void setIndicator(Animation animation);
 	void addOption(const std::string& option);
 	void addOption(const std::string& option, std::function<void()> handler);
+	// A non-selectable heading line (the original's title menus: "Which game
+	// do you want to play?" etc.), drawn 20 px above the first item.
+	void addTitle(const std::string& title);
 	void addSpace();
+	void clear();
+	// Called on the back/escape button; not set = escape ignored (the
+	// original's main menu can't be escaped).
+	void setEscapeHandler(std::function<void()> handler);
+	// Positions the block the way the original's menu drawer (HOCUS.EXE
+	// FUN_16b8_19a4) does: centred horizontally on the widest item, and
+	// vertically within the 144 px band below the top image (y 40..184),
+	// 10 px per line plus 4 px after each "spacer" item.
+	void layoutLikeOriginal();
+	[[nodiscard]] bool isEmpty() const;
 	void setFont(data::asset::Font font);
 	void setPalette(data::asset::Palette& palette);
 	void render(Renderer& renderer);
@@ -54,6 +67,8 @@ public:
 	void moveUp();
 	
 	int8_t getCurrentSelection() const;
+	// The original keeps each menu's cursor between visits (16b8:0b21 loads it).
+	void setCurrentSelection(int8_t selection);
 
 private:
 	data::asset::Font font;
@@ -67,6 +82,9 @@ private:
 	std::unique_ptr<Texture> bottomLabel { nullptr };
 	int8_t currentSelection { 0 };
 	Animation indicatorAnimation;
+	std::string titleText;
+	std::unique_ptr<Texture> titleLabel { nullptr };
+	std::function<void()> escapeHandler;
 	
 };
 

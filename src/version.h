@@ -18,106 +18,110 @@
 #ifndef _VERSION_H
 #define _VERSION_H
 
-#define VERSION SHAREWARE
+#include <cstdint>
+#include <string>
+#include <vector>
 
-#if(VERSION == SHAREWARE)
-#define FAT_FILE			"../data/shareware.fat"
-#define EXE_FAT_FILE		"../data/shareware_exe.fat"
-#define EPISODES 			1
-#define STAGES				9
-enum DatFile {
-	DATFILE_FONT_MAIN = 0,
-	DATFILE_SPLASH_APOGEE = 1,
-	DATFILE_SPLASH_INTRO = 2,
-	DATFILE_PALETTE_GAME = 6,
-	DATFILE_PALETTE_MENU = 7,
-	DATFILE_IMAGE_BOTTOM = 8,
-	DATFILE_IMAGE_TOP = 9,
-	DATFILE_IMAGE_STUFF = 10,
-	DATFILE_IMAGE_HUD = 11,
-	DATFILE_IMAGE_MENU_SELECTION = 13,
-	DATFILE_PALETTE_BACKGROUND_01 = 62,
-	DATFILE_IMAGE_BACKGROUND_01 = 66,
-	DATFILE_TILESET_01 = 70,
-	DATFILE_SPRITE_SET = 83,
-	DATFILE_LEVELS_START = 84,
-	DATFILE_MUSIC_APOGEE = 201,
-	DATFILE_MUSIC_01 = 202,
-	DATFILE_MUSIC_02 = 203,
-	DATFILE_MUSIC_INTRO = 204,
-	DATFILE_MUSIC_03 = 205,
-	DATFILE_MUSIC_04 = 206,
-	DATFILE_MUSIC_05 = 207,
-	DATFILE_VOC_LAUGH = 212,
-	DATFILE_VOC_POTION = 225,
-	DATFILE_VOC_ITEM_1 = 227,
-	DATFILE_VOC_ITEM_2 = 229,
-	DATFILE_VOC_HINT = 231,
-	DATFILE_VOC_HIT = 241,
-	DATFILE_VOC_WIN = 243,
-	DATFILE_VOC_KILL = 245
+// Both known releases have nine levels per episode.
+#define STAGES 9
+
+namespace pocus {
+
+// Indices into HOCUS.DAT for one release. The two known releases (registered
+// v1.1: 652 files, shareware v1.1: 253 files) hold byte-identical copies of
+// the shared files at different indices; the mapping below was made by
+// comparing the two DATs file by file and against the HOCUS.EXE code that
+// loads each index (reverse-engineering notes, "Data files"). -1 = the release
+// does not have the file.
+struct DatFiles {
+	int fontMain;              // 720-byte 1bpp font (90 glyphs)
+	int splashApogee;          // PCX, Apogee logo (1b97:0001)
+	int splashIntro;           // PCX, title screen
+	int titleBand;             // 320x12 image "Registered Version 1.1 ..." drawn at (0,188) over the title (registered only)
+	int antiPiracyPcx;         // PCX "This game IS NOT shareware" shown before the Apogee logo (registered only)
+	int episodeCompletePcx;    // PCX shown after the boss level (16b8:4d76)
+	int paletteGame;           // 128 colours 0..127 (in-game half of the palette)
+	int paletteMenu;           // 128 colours 128..255 (menu half)
+	int imageBottom;           // 320x16, bottom menu frame (drawn at 0,184)
+	int imageTop;              // 320x39, top menu frame
+	int imageStuff;            // 112x12 HUD icons
+	int imageHud;              // 320x40 HUD
+	int imageOrderBand;        // 320x40 band under the order screens (16b8:4398)
+	int imageMenuSelection;    // 128x15, 8 selector frames of 16x15
+	int imageVolumeCells;      // 32x13, the two 16x13 slider cells of the volume screen (16b8:1316)
+	int imagePanel;            // 220x68 in-game panel (level_run draws it at 48,46)
+	int idleScreensStart;      // 2 PCX shown after 32 s idle in the main menu (16b8:42cb)
+	int instructionsStart;     // 5 PCX (page 0 = keyboard, 1 = joystick, 2..4 shared) (16b8:44cc)
+	int orderScreensStart;     // 11 PCX order/catalog screens (16b8:4398)
+	int orderingTextStart;     // 9 text pages, "Ordering Information" (16b8:407d)
+	int aboutApogeeText;       // text page
+	int notRegisteredText;     // text page shown by 16b8:429a
+	int legendsTextStart;      // 10 text pages, "Legends and hints" (16b8:40bd)
+	int endingTextStart;       // episode ending text pages: ep1 2, ep2 2, ep3 4, ep4 2 (16b8:40fd/413d/417d/41bd)
+	int endingFinalPcx;        // PCX after the episode 4 ending (registered only)
+	int paletteBackground01;   // 16 (registered) / 4 (shareware) backdrop palettes
+	int imageBackground01;     // backdrops (PCX)
+	int tileset01;             // tilesets (PCX)
+	int pageImageBase;         // first of the planar images the legends/ending pages place (DS:1912 tables use offsets 0..8 from here)
+	int spriteSet;
+	int levelsStart;           // 13 file types x (episodes*9) levels
+	int musicApogee;
+	int musicLevelStart;       // level tunes, indexed by the EXE's level music table
+	int musicIntro;            // menu/title tune (DOS 0x25a)
+	int vocLaugh;              // the intro laugh (+4 = the episode-complete sound); the effects come from the EXE's sound table
 };
-enum ExeFile {
-	EXEFILE_LIMIT_TIME = 0,
-	EXEFILE_ITEMS = 1,
-	EXEFILE_TILESETS = 2,
-	EXEFILE_BACKGROUNDS = 3,
-	EXEFILE_MUSIC = 4,
-	EXEFILE_ELEVATORS = 5
+
+// Indices into the extracted HOCUS.EXE tables (data/<release>_exe.fat).
+struct ExeFiles {
+	int limitTime;
+	int items;
+	int tilesets;
+	int backgrounds;
+	int music;
+	int elevators;
 };
+
 enum Sprite_t {
 	SPRITE_HOCUS = 0,
-	SPRITE_SCORE = 1
+	SPRITE_SCORE = 1,   // "Score Tags": row 0 the 100..5000 tags, row 1 the pickup icons
+	SPRITE_TWINKS = 2,  // the sparkle (5 frames, 2 rows)
+	SPRITE_MORPH = 3    // Hocus's teleport morph (5 frames)
 };
-#elif(VERSION == REGISTERED)
-#define FAT_FILE			"registered.fat"
-#define EXE_FAT_FILE		"regeistered_exe.fat"
-#define EPISODES 			4
-#define STAGES				9
-enum DatFile {
-	DATFILE_FONT_MAIN = 0,
-	DATFILE_SPLASH_APOGEE = 1,
-	DATFILE_SPLASH_INTRO = 2,
-	DATFILE_PALETTE_GAME = 7,
-	DATFILE_PALETTE_MENU = 8,,
-	DATFILE_IMAGE_BOTTOM = 9,
-	DATFILE_IMAGE_TOP = 10,
-	DATFILE_IMAGE_STUFF = 11,
-	DATFILE_IMAGE_HUD = 12,
-	DATFILE_IMAGE_MENU_SELECTION = 14,
-	DATFILE_PALETTE_BACKGROUND_01 = 73,
-	DATFILE_IMAGE_BACKGROUND_01 = 89,
-	DATFILE_TILESET_01 = 105,
-	DATFILE_SPRITE_SET = 130,
-	DATFILE_LEVELS_START = 131,
-	DATFILE_MUSIC_APOGEE = 599,
-	DATFILE_MUSIC_01 = 600,
-	DATFILE_MUSIC_02 = 601,
-	DATFILE_MUSIC_INTRO = 602,
-	DATFILE_MUSIC_03 = 603,
-	DATFILE_MUSIC_04 = 604,
-	DATFILE_MUSIC_05 = 605,
-	DATFILE_VOC_LAUGH = 611,
-	DATFILE_VOC_POTION = 624,
-	DATFILE_VOC_ITEM_1 = 626,
-	DATFILE_VOC_ITEM_2 = 228,
-	DATFILE_VOC_HINT = 630,
-	DATFILE_VOC_HIT = 640,
-	DATFILE_VOC_WIN = 642,
-	DATFILE_VOC_KILL = 644
+
+// One release of the game, chosen at start-up from the installed HOCUS.DAT /
+// HOCUS.EXE (see GameVersion::detect). Everything version-specific in the
+// port reads from here instead of compile-time constants.
+struct GameVersion {
+	const char* name;
+	bool shareware;
+	uint32_t datSize;         // exact HOCUS.DAT size of the release
+	uint32_t exeSize;         // exact HOCUS.EXE size (the extracted tables are offsets into it)
+	const char* datFat;       // FAT of HOCUS.DAT, relative to data/
+	const char* exeFat;       // FAT of the EXE tables, relative to data/
+	int episodes;
+	DatFiles dat;
+	ExeFiles exe;
+
+	// Where the detected copy lives (directory holding HOCUS.DAT/HOCUS.EXE/HOCUS.SAV).
+	std::string installationPath;
+	std::string datPath;
+	std::string exePath;
+	std::string savePath;
+
+	// The release detected at start-up.
+	static const GameVersion& get();
+
+	// Looks for HOCUS.DAT + HOCUS.EXE in each path; when more than one release
+	// is installed the registered one wins. Returns false when none matches.
+	static bool detect(const std::vector<std::string>& installationPaths);
+
+	static const GameVersion REGISTERED;
+	static const GameVersion SHAREWARE;
 };
-enum ExeFile {
-	EXEFILE_LIMIT_TIME = 0,
-	EXEFILE_ITEMS = 1,
-	EXEFILE_TILESETS = 2,
-	EXEFILE_BACKGROUNDS = 3,
-	EXEFILE_MUSIC = 4,
-	EXEFILE_ELEVATORS = 5
-};
-enum Sprite_t {
-	SPRITE_HOCUS = 0,
-	SPRITE_SCORE = 1
-};
-#endif
+
+inline const DatFiles& datFiles() { return GameVersion::get().dat; }
+inline const ExeFiles& exeFiles() { return GameVersion::get().exe; }
+
+}
 
 #endif //_VERSION_H

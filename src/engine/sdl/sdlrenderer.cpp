@@ -43,6 +43,11 @@ bool SdlRenderer::initialize() {
 	this->renderer = SDL_CreateRenderer(this->window, -1,
 			SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (!this->renderer) {
+		// No accelerated renderer (headless runs with SDL's dummy video
+		// driver, or a bare VM): the software one draws the same picture.
+		this->renderer = SDL_CreateRenderer(this->window, -1, SDL_RENDERER_SOFTWARE);
+	}
+	if (!this->renderer) {
 		return false;
 	}
 

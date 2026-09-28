@@ -20,6 +20,7 @@
 
 #include <plog/Log.h>
 #include <plog/Initializers/RollingFileInitializer.h>
+#include <plog/Appenders/ColorConsoleAppender.h>
 
 namespace pocus {
 

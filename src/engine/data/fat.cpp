@@ -32,5 +32,5 @@ const FatEntry& Fat::getEntry(uint32_t index) const {
 }
 
 bool Fat::loadFromFile(const std::string& filename) {
-
+	return false;
 }

@@ -42,7 +42,9 @@ void Hud::render(Renderer &renderer) {
 	renderer.drawTexture(*this->labelScore, Point(SCORE_X + ((SCORE_WIDTH / 2) - (this->labelScore->getWidth() / 2)), SCORE_Y));
 	renderer.drawTexture(*this->labelHealth, Point(HEALTH_X + ((HEALTH_WIDTH / 2) - (this->labelHealth->getWidth() / 2)), HEALTH_Y));
 	renderer.drawTexture(*this->labelCrystals, Point(CRYSTALS_X + ((CRYSTALS_WIDTH / 2) - (this->labelCrystals->getWidth() / 2)), CRYSTALS_Y));
-	renderer.drawTexture(*this->labelLevel, Point(LEVEL_X, LEVEL_Y));
+	if (this->levelVisible) {
+		renderer.drawTexture(*this->labelLevel, Point(LEVEL_X, LEVEL_Y));
+	}
 	
 	if (this->goldenKey) {
 		if (this->silverKey) {

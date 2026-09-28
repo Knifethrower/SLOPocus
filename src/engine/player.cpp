@@ -74,3 +74,27 @@ bool Player::hasGoldenKey() const {
 void Player::setGoldKey(bool goldKey) {
 	Player::goldKey = goldKey;
 }
+
+uint8_t Player::getFirePower() const {
+	return this->firePower;
+}
+
+void Player::setFirePower(uint8_t power) {
+	Player::firePower = power;
+}
+
+bool Player::hasSuperJump() const {
+	return this->superJump;
+}
+
+void Player::setSuperJump(bool superJump) {
+	Player::superJump = superJump;
+}
+
+Difficulty_t Player::getDifficulty() const {
+	return this->difficulty;
+}
+
+void Player::setDifficulty(Difficulty_t difficulty) {
+	Player::difficulty = difficulty;
+}

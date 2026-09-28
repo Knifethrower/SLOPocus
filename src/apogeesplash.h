@@ -25,10 +25,15 @@
 #include "engine/fade.h"
 #include "engine/sound.h"
 
+// The start of the original's intro (1b97:0001 registered, 1b93:000c
+// shareware): the registered game first shows its "This game IS NOT
+// shareware" notice (file 17) for up to 15 s, then both show the Apogee
+// logo with its fanfare for up to 9 s. Any key cuts a picture short
+// (2392:0108); the logo fades out in 30 steps and the title follows.
 class ApogeeSplash : public pocus::State {
 public:
-	enum { TIME = 10000 };
-	
+	enum { NOTICE_TIME = 15000, LOGO_TIME = 9000 };
+
 public:
 	void onCreate(pocus::data::DataManager& dataManager) override;
 	void onDetach() override;
@@ -39,10 +44,19 @@ public:
 	void update(float dt) override;
 
 private:
-	std::unique_ptr<pocus::Texture> backgroundImage;
+	enum Phase { NOTICE, LOGO };
+
+	void showLogo();
+	void leave();
+
+	std::unique_ptr<pocus::Texture> noticeImage;
+	std::unique_ptr<pocus::Texture> logoImage;
 	std::unique_ptr<pocus::Sound> backgroundMusic;
 	pocus::Tick startTick { pocus::getNow() };
 	pocus::Fade fade;
+	Phase phase { LOGO };
+	bool leaving { false };
+	bool skipPending { false };
 };
 
 #endif //_APOGEESPLASH_H

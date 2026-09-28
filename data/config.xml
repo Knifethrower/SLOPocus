@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <config>
-    <installation_path>../hocuspocus</installation_path>
+    <!-- Every path is checked for HOCUS.DAT + HOCUS.EXE; the registered
+         release is used when more than one release is installed. -->
+    <installation_path>/mnt/c/Claude/Hocus Pocus/Hocus</installation_path>
+    <installation_path>/mnt/c/Claude/Hocus Pocus/DOSBOX_HOCUS</installation_path>
+    <!-- The same copies as seen by the native Windows build. -->
+    <installation_path>C:/Claude/Hocus Pocus/Hocus</installation_path>
+    <installation_path>C:/Claude/Hocus Pocus/DOSBOX_HOCUS</installation_path>
 </config>

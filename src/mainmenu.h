@@ -23,8 +23,23 @@
 #include "engine/particles.h"
 #include "engine/animation.h"
 #include "engine/fade.h"
+#include "engine/sound.h"
+#include "engine/data/asset/font.h"
+#include "engine/data/asset/palette.h"
+#include "screens/screen.h"
+#include "stategame.h"
 
+// The original's out-of-game menus (HOCUS.EXE main loop 1548:035a and the
+// menu tables at DS:1a06.. - see the reverse-engineering notes, "Menus"): the main menu
+// and its sub-menus (episode, skill, options, game speed), drawn over the
+// star field between the top and bottom images, and the screens the items
+// open (Restore, Ordering, Instructions, Legends, High scores, Volume, Keys,
+// the shareware's Preview future levels). The shareware main menu (its
+// table at DS:0dcc) has nine items and shows the preview/order screens.
 class MainMenu : public pocus::State {
+public:
+	enum Screen_t { MAIN, EPISODE, SKILL, OPTIONS, SPEED };
+
 public:
 	void onCreate(pocus::data::DataManager& dataManager) override;
 	void onDetach() override;
@@ -33,13 +48,35 @@ public:
 	void handleEvents(pocus::EventHandler &eventHandler) override;
 	void render(pocus::Renderer &renderer) override;
 	void update(float dt) override;
-	
+
+	void setStateGame(StateGame& stateGame);
+
 private:
+	void showScreen(Screen_t screen);
+	void buildMain();
+	void buildEpisode();
+	void buildSkill();
+	void buildOptions();
+	void buildSpeed();
+	void startMenuMusic();
+	void quit();
+
+	StateGame* stateGame { nullptr };
 	pocus::Menu menu;
 	pocus::Particles particles;
 	std::unique_ptr<pocus::Texture> bottomTexture;
 	std::unique_ptr<pocus::Texture> topTexture;
+	std::unique_ptr<pocus::Sound> menuMusic;
+	pocus::ui::ScreenAssets assets;
+	pocus::ui::ScreenHost screens;
 	pocus::Fade fade;
+	Screen_t screen { MAIN };
+	// Each menu's cursor position, kept between visits like the original.
+	int8_t lastSelection[5] { 0, 0, 0, 0, 0 };
+	uint8_t chosenEpisode { 1 };
+	bool leaving { false };
+	// 16b8:2259: 4500 timer ticks without a key show the idle pictures.
+	pocus::Tick lastInput { pocus::getNow() };
 };
 
 #endif // MAINMENU_H

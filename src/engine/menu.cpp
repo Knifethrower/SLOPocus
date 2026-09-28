@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
 #include <iostream>
 #include <functional>
 #include "menu.h"
@@ -42,6 +43,50 @@ void Menu::addSpace() {
 	this->options.emplace_back("", nullptr, nullptr);
 }
 
+void Menu::addTitle(const std::string& title) {
+	this->titleText = title;
+	this->titleLabel = this->font.writeGradientShadow(title, this->palette, this->bottomTextColor);
+}
+
+void Menu::clear() {
+	this->options.clear();
+	this->titleText.clear();
+	this->titleLabel = nullptr;
+	this->currentSelection = 0;
+}
+
+void Menu::setEscapeHandler(std::function<void()> handler) {
+	this->escapeHandler = std::move(handler);
+}
+
+bool Menu::isEmpty() const {
+	return this->options.empty();
+}
+
+void Menu::layoutLikeOriginal() {
+	int maxWidth = 0;
+	int lines = 0;
+	int gaps = 0;
+	for (const auto& option : this->options) {
+		if (std::get<0>(option).empty()) {
+			gaps += SPACE_HEIGHT;
+			continue;
+		}
+		lines++;
+		maxWidth = std::max<int>(maxWidth, (int)this->font.calculateWidth(std::get<0>(option)));
+	}
+	const int x = (SCREEN_WIDTH - maxWidth) / 2;
+	int y;
+	if (this->titleLabel) {
+		// Title 20 px above the block; the original centres title + items.
+		y = (144 - (lines + 1) * 10 + gaps) / 2 + 60;
+	}
+	else {
+		y = (144 - (lines * 10 + gaps)) / 2 + 40;
+	}
+	this->position = Point((float)x, (float)y);
+}
+
 void Menu::setIndicator(Animation animation) {
 	this->indicatorAnimation = std::move(animation);
 }
@@ -51,6 +96,10 @@ void Menu::update(float dt) {
 }
 
 void Menu::render(Renderer &renderer) {
+	if (this->titleLabel) {
+		renderer.drawTexture(*this->titleLabel, Point(SCREEN_WIDTH / 2 - this->font.calculateWidth(this->titleText) / 2, this->position.getY() - 20));
+	}
+
 	uint32_t label = 0;
 	uint32_t yOffset = this->position.getY();
 	for (int i = 0; i < this->options.size(); i++) {
@@ -62,13 +111,13 @@ void Menu::render(Renderer &renderer) {
 		else {
 			offset = Menu::SPACE_HEIGHT;
 		}
-		
+
 		if (this->currentSelection == i) {
-			this->indicatorAnimation.render(renderer, Point(
-											this->position.getX() - this->indicatorAnimation.getWidth() * 1.5,
-											yOffset - (this->indicatorAnimation.getHeight() * 0.25)));
+			// The original draws the selector 24 px left of the text column,
+			// 4 px above the line.
+			this->indicatorAnimation.render(renderer, Point(this->position.getX() - 24, yOffset - 4));
 		}
-		
+
 		yOffset += offset;
 	}
 	
@@ -79,6 +128,9 @@ void Menu::render(Renderer &renderer) {
 }
 
 void Menu::handleEvents(EventHandler& eventHandler) {
+	if (this->options.empty()) {
+		return;
+	}
 	if (eventHandler.isButtonDown(pocus::BUTTON_DOWN)) {
 		moveDown();
 	}
@@ -87,7 +139,15 @@ void Menu::handleEvents(EventHandler& eventHandler) {
 	}
 	else if (eventHandler.isButtonDown(pocus::BUTTON_SELECTION)) {
 		if (std::get<1>(this->options[this->currentSelection])) {
-			std::get<1>(this->options[this->currentSelection])();
+			// Copy: the handler may rebuild this menu (clear()) while running.
+			auto handler = std::get<1>(this->options[this->currentSelection]);
+			handler();
+		}
+	}
+	else if (eventHandler.isButtonDown(pocus::BUTTON_BACK)) {
+		if (this->escapeHandler) {
+			auto handler = this->escapeHandler;
+			handler();
 		}
 	}
 }
@@ -147,4 +207,12 @@ void Menu::moveUp() {
 
 int8_t Menu::getCurrentSelection() const {
 	return currentSelection;
+}
+
+void Menu::setCurrentSelection(int8_t selection) {
+	if (selection < 0 || selection >= (int8_t)this->options.size() || std::get<0>(this->options[selection]).empty()) {
+		this->currentSelection = 0;
+		return;
+	}
+	this->currentSelection = selection;
 }

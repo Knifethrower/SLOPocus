@@ -19,19 +19,22 @@
 #define CONFIG_H
 
 #include <string>
+#include <vector>
 
 namespace pocus {
 
 class Config {
 public:
 	bool load(const std::string& filename);
-	
-	const std::string &getInstallationPath() const;
-	
-	void setInstallationPath(const std::string &installationPath);
-	
+
+	// Every <installation_path> of config.xml, in file order; GameVersion
+	// picks the release to run from them.
+	const std::vector<std::string>& getInstallationPaths() const;
+
+	void addInstallationPath(const std::string& installationPath);
+
 private:
-	std::string installationPath;
+	std::vector<std::string> installationPaths;
 };
 
 }

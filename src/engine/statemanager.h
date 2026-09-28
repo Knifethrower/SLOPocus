@@ -39,7 +39,7 @@ public:
 
 	void release();
 
-	void addState(const std::string &name, std::unique_ptr<State> state);
+	State& addState(const std::string &name, std::unique_ptr<State> state);
 	void changeState(const std::string &name);
 	State* getCurrentState();
 	

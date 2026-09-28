@@ -145,7 +145,18 @@ void Map::setTileSet(const std::unique_ptr<Texture>& tileSet) {
 	const uint32_t rows = 12;
 	const uint32_t frameWidth = TILE_SIZE;
 	const uint32_t frameHeight = TILE_SIZE;
-	
+
+	// Loading a second level (StateGame::startLevel()/loadNextLevel(), now
+	// reachable within the same run) re-slices whatever
+	// tileset PCX that level uses into this same vector. Never clearing it
+	// left the previous level's 240 slices sitting at indices [0, 240) with
+	// the new level's slices appended after - and since Map::create() below
+	// always reads indices [0, 240) (tile ids never exceed that), every level
+	// after the first silently kept rendering the FIRST level's tileset. Only
+	// visible once two consecutive levels use different tileset ids - 1-1 and
+	// 1-2 happen to share one, which is why this went unnoticed until 1-3.
+	this->tileSet.clear();
+
 	for (int i = 0; i < columns * rows; i++) {
 		const uint32_t x = i % columns;
 		const uint32_t y = i / columns;
@@ -204,6 +215,50 @@ void Map::update(float dt) {
 	}
 }
 
+void Map::animateTick(int cameraCol, int cameraRow) {
+	const data::asset::TileAnimationSettings::Entry* anim = this->tileAnimationSettings.getEntries();
+	for (int dy = 0; dy < 10; dy++) {
+		for (int dx = 0; dx < 21; dx++) {
+			const int x = cameraCol + dx;
+			const int y = cameraRow + dy;
+			if (x < 0 || x >= (int)this->width || y < 0 || y >= (int)this->height) {
+				continue;
+			}
+			Tile& tile = this->layers[0].getTile(x, y);
+			const uint16_t id = tile.getId();
+			if (id >= data::asset::TileAnimationSettings::TILES || anim[id].animationType == 0) {
+				continue;
+			}
+			const data::asset::TileAnimationSettings::Entry& entry = anim[id];
+			uint16_t next = id;
+			if (entry.animationType == data::asset::TileAnimationSettings::PERMANENT) {
+				next = id + 1;
+				if (next > entry.lastIndex) {
+					next = entry.firstIndex;
+				}
+			}
+			else if (entry.animationType == data::asset::TileAnimationSettings::RANDOM) {
+				// Rests on its first frame; 1-in-20 per frame it starts a run
+				// through the cycle, which then plays once back to the first.
+				if (id == entry.firstIndex) {
+					if (rand() % 20 == 0) {
+						next = id + 1;
+					}
+				}
+				else {
+					next = id + 1;
+					if (next > entry.lastIndex) {
+						next = entry.firstIndex;
+					}
+				}
+			}
+			if (next != id) {
+				setTile(0, Point((float)x, (float)y), next);
+			}
+		}
+	}
+}
+
 void Map::start() {
 	//this->backgroundMusic->play();
 }
@@ -211,40 +266,26 @@ void Map::start() {
 void Map::create(uint32_t width, uint32_t height) {
 	this->width = width;
 	this->height = height;
-	
+
 	this->crystals = 0;
-	
+
+	// Same append-only bug as Map::setTileSet() above: without clearing,
+	// a second level load leaves this level's 240 fresh animations sitting
+	// after the previous level's, while every lookup only ever reads the
+	// first 240 - so a repeat level load never actually replaced anything.
+	this->animatedTileSet.clear();
+	this->layers.clear();
+
 	// Create fixed layers: 0 background; 1 tiles
 	this->layers.emplace_back(width, height);
 	this->layers.emplace_back(width, height);
 	
-	// Create tile animation prototypes
+	// One static frame per tile id. Animation is done the original's way, by
+	// rewriting the background layer's tile ids each game frame (animateTick).
 	for (uint32_t i = 0; i < data::asset::TileAnimationSettings::TILES; i++) {
-		const data::asset::TileAnimationSettings::Entry& entry = this->tileAnimationSettings.getEntries()[i];
-		
 		Animation animation;
-		animation.setFps(10);
-		
-		if (entry.animationType == data::asset::TileAnimationSettings::RANDOM) {
-			animation.setRandomStart(true);
-		}
-		
-		if (entry.firstIndex != entry.lastIndex && entry.animationType == data::asset::TileAnimationSettings::PERMANENT) {
-			for (uint16_t frameIndex = entry.firstIndex; frameIndex < entry.lastIndex + 1; frameIndex++) {
-				animation.addFrame(
-					this->tileSet[frameIndex]->extract(0, 0, TILE_SIZE, TILE_SIZE)
-				);
-			}
-			
-			// Randomize starting frame
-			animation.setCurrentFrame(rand() % animation.getFrameCount());
-			
-			this->animatedTileSet.emplace_back(std::move(animation));
-		}
-		else {
-			animation.addFrame(this->tileSet[i]->extract(0, 0, TILE_SIZE, TILE_SIZE));
-			this->animatedTileSet.emplace_back(std::move(animation));
-		}
+		animation.addFrame(this->tileSet[i]->extract(0, 0, TILE_SIZE, TILE_SIZE));
+		this->animatedTileSet.emplace_back(std::move(animation));
 	}
 	
 	for (uint32_t i = 0; i < width * height; i++) {
@@ -389,6 +430,19 @@ void Map::setLimitTime(uint32_t limitTime) {
 	Map::limitTime = limitTime;
 }
 
+int16_t Map::getElevatorLeftTile() const {
+	return this->elevatorLeftTile;
+}
+
+int16_t Map::getElevatorRightTile() const {
+	return this->elevatorRightTile;
+}
+
+void Map::setElevatorTiles(int16_t leftTile, int16_t rightTile) {
+	this->elevatorLeftTile = leftTile;
+	this->elevatorRightTile = rightTile;
+}
+
 uint8_t Map::getCrystals() const {
 	return crystals;
 }
@@ -408,6 +462,24 @@ void Map::removeTile(uint8_t layer, const Point& tilePosition) {
 	// Replace tile with background tile
 	tile.getAnimation().createFrom(this->animatedTileSet[backgroundId]);
 	tile.setId(backgroundId);
+}
+
+void Map::setTile(uint8_t layer, const Point& tilePosition, uint16_t id) {
+	Tile& tile = this->layers[layer].getTile((int)tilePosition.getX(), (int)tilePosition.getY());
+
+	tile.setId(id);
+	tile.setVisible(id != data::asset::MapLayer::TILE_EMPTY);
+	if (tile.isVisible()) {
+		tile.getAnimation().createFrom(this->animatedTileSet[id]);
+	}
+}
+
+void Map::fillRegion(uint8_t layer, const Point& topLeft, const Point& bottomRight, uint16_t id) {
+	for (int y = (int)topLeft.getY(); y <= (int)bottomRight.getY(); y++) {
+		for (int x = (int)topLeft.getX(); x <= (int)bottomRight.getX(); x++) {
+			setTile(layer, Point((float)x, (float)y), id);
+		}
+	}
 }
 
 Map::Chunk::Chunk(const Size &size):

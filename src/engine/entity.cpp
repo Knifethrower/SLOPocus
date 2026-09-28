@@ -38,6 +38,11 @@ void Entity::setCurrentState(const std::string& state) {
 	this->currentState = &this->states.find(state)->second;
 }
 
+Animation* Entity::findState(const std::string& state) {
+	auto iterator = this->states.find(state);
+	return iterator == this->states.end() ? nullptr : &iterator->second;
+}
+
 void Entity::render(Renderer &renderer, const Point& offset) {
 	Point position = Point(
 		this->rect.getPosition().getX() - offset.getX(),
@@ -143,6 +148,8 @@ std::string Entity::getDirectionName(const Direction_t& direction) {
 		case Entity::LEFT: return "left";
 		case Entity::RIGHT: return "right";
 	}
+
+	return "";
 }
 
 const Tick &Entity::getTickCreation() const {

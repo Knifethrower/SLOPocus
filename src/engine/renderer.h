@@ -47,6 +47,7 @@ public:
 	virtual void drawTexture(Texture& texture, const Point& point) = 0;
 	virtual void drawRect(const Rect& rect, const Color& color) = 0;
 	virtual void drawPoint(const Point& point, const Color& color) = 0;
+
 };
 
 }

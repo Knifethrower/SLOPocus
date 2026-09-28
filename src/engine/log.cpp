@@ -20,5 +20,8 @@
 using namespace pocus;
 
 void Log::initialize(const std::string& filename) {
-	plog::init(plog::debug, filename.c_str());
+	static plog::RollingFileAppender<plog::TxtFormatter> fileAppender(filename.c_str(), 8000, 3);
+	static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
+
+	plog::init(plog::debug, &fileAppender).addAppender(&consoleAppender);
 }
