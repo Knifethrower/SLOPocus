@@ -18,7 +18,7 @@
 #ifndef SLOPOCUS_DEFINITIONS_H
 #define SLOPOCUS_DEFINITIONS_H
 
-#define GAME_NAME  		"Open Pocus"
+#define GAME_NAME  		"SLOPocus"
 #define SCREEN_WIDTH	320
 #define SCREEN_HEIGHT	200
 
