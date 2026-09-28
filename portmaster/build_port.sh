@@ -9,13 +9,13 @@
 #
 #   sudo apt-get install debootstrap qemu-user-static rsync zip
 #   sudo debootstrap --arch=arm64 --include=libsdl2-dev,libsdl2-image-dev,libsdl2-mixer-dev \
-#        bullseye ~/sysroot-arm64 http://deb.debian.org/debian
-#   SYSROOT=~/sysroot-arm64 portmaster/build_port.sh
+#        bullseye ~/hocus_re/sysroot-arm64 http://deb.debian.org/debian
+#   portmaster/build_port.sh          (SYSROOT=... points at another chroot)
 # SKIP_BUILD=1 reuses build-aarch64/SLOPocus and only packages.
 set -e
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
-SYSROOT="${SYSROOT:-$HOME/sysroot-arm64}"
+SYSROOT="${SYSROOT:-$HOME/hocus_re/sysroot-arm64}"
 OUT="$HERE/out"
 
 if [ -z "$SKIP_BUILD" ]; then
